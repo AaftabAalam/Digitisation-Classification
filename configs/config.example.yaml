@@ -1,0 +1,7 @@
+project_root: .
+data_dir: data
+model_dir: data/models/classifier
+feedback_dir: data/feedback/classification
+exports_dir: data/exports
+low_confidence_threshold: 0.5
+retrain_min_samples: 20

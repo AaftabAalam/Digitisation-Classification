@@ -1,0 +1,7 @@
+{
+  "image_path": "data/incoming/yellow.jpg",
+  "true_label": "School_Bus",
+  "predicted_label": null,
+  "confidence": 0.0,
+  "metadata": {}
+}
