@@ -160,18 +160,3 @@ python scripts/mlops/summarize_monitoring.py
 
 7. Runtime health:
 - `/health` endpoint is stable after deploy.
-
-## AWS Information Needed To Complete Production Setup
-Share these values if you want exact production commands/config from me:
-1. AWS region (example: `us-east-1`)
-2. AWS account ID
-3. ECR repository name
-4. ECS cluster name
-5. ECS service name
-6. Existing ALB DNS (if already created)
-7. Route53 domain/subdomain (optional)
-8. Whether you will use GitHub OIDC role or access keys for Actions
-
-## Notes
-- Existing CLI/API functionality remains intact.
-- MLOps components are additive and can be adopted gradually.
