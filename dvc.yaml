@@ -1,0 +1,29 @@
+stages:
+  retrain:
+    cmd: python scripts/mlops/retrain_with_metrics.py
+    deps:
+      - src/contract_ai/retraining/manager.py
+      - src/contract_ai/classification/classifier.py
+      - src/contract_ai/classification/dataset.py
+      - src/contract_ai/mlops/gates.py
+      - src/contract_ai/mlops/tracking.py
+      - data/feedback/classification
+    params:
+      - retrain.min_samples
+      - retrain.validation_split
+      - retrain.promote_min_f1
+      - retrain.promote_min_precision
+      - retrain.promote_min_recall
+      - retrain.device
+    outs:
+      - data/models/classifier/current/classifier.joblib
+    metrics:
+      - data/models/classifier/latest_retrain_result.json
+
+  monitor-report:
+    cmd: python scripts/mlops/summarize_monitoring.py
+    deps:
+      - data/monitoring/predictions.jsonl
+      - scripts/mlops/summarize_monitoring.py
+    outs:
+      - data/monitoring/summary.json

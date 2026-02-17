@@ -9,6 +9,7 @@ from contract_ai.classification.classifier import ProductClassifier
 from contract_ai.common.schemas import FeedbackRecord
 from contract_ai.common.settings import settings
 from contract_ai.contracts.pipeline import ContractExtractor
+from contract_ai.mlops.monitoring import log_prediction_event
 from contract_ai.retraining.manager import FeedbackManager, RetrainOrchestrator
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -31,6 +32,14 @@ def classify_image(
     label_list = [x.strip() for x in labels.split(",") if x.strip()]
     clf = ProductClassifier(model_path=settings.active_model_path if settings.active_model_path.exists() else None)
     res = clf.predict(input, label_list)
+    log_prediction_event(
+        settings.prediction_log_path,
+        image_path=str(input),
+        label=res.label,
+        confidence=res.confidence,
+        scores=res.scores,
+        interface="cli",
+    )
 
     queued = False
     if res.confidence < settings.low_confidence_threshold:
@@ -73,7 +82,23 @@ def retrain() -> None:
     if artifact is None:
         print("[yellow]Skipped[/yellow] not enough labeled feedback samples")
         return
-    print(f"[green]Promoted[/green] model={artifact.version} labels={artifact.labels}")
+    if artifact.promoted:
+        print(
+            f"[green]Promoted[/green] model={artifact.version} labels={artifact.labels} "
+            f"metrics={artifact.metrics}"
+        )
+    else:
+        print(
+            f"[yellow]Trained but not promoted[/yellow] model={artifact.version} "
+            f"gate_reasons={artifact.gate_reasons} metrics={artifact.metrics}"
+        )
+
+
+@app.command("mlops-run-flow")
+def mlops_run_flow(min_samples: int = typer.Option(20, "--min-samples"), device: str = typer.Option("cpu", "--device")) -> None:
+    from contract_ai.mlops.flows import retrain_flow
+
+    print(retrain_flow(min_samples=min_samples, device=device))
 
 
 if __name__ == "__main__":

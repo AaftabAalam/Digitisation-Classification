@@ -3,5 +3,12 @@ data_dir: data
 model_dir: data/models/classifier
 feedback_dir: data/feedback/classification
 exports_dir: data/exports
+monitoring_dir: data/monitoring
 low_confidence_threshold: 0.5
 retrain_min_samples: 20
+validation_split: 0.2
+promote_min_f1: 0.7
+promote_min_precision: 0.7
+promote_min_recall: 0.7
+mlflow_tracking_uri: file:./data/mlruns
+mlflow_experiment_name: contract-ai-retraining

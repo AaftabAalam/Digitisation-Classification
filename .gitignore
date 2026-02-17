@@ -4,6 +4,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 *.egg-info/
+mlruns/
+.dvc/cache/
 data/models/
 data/exports/
 .DS_Store

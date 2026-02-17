@@ -8,6 +8,7 @@ from contract_ai.classification.classifier import ProductClassifier
 from contract_ai.common.schemas import FeedbackRecord
 from contract_ai.common.settings import settings
 from contract_ai.contracts.pipeline import ContractExtractor
+from contract_ai.mlops.monitoring import log_prediction_event
 from contract_ai.retraining.manager import FeedbackManager, RetrainOrchestrator
 
 app = FastAPI(title="Contract Digitization AI", version="0.1.0")
@@ -41,6 +42,14 @@ async def classify_product(
 
     clf = ProductClassifier(model_path=settings.active_model_path if settings.active_model_path.exists() else None)
     res = clf.predict(temp_path, labels_list)
+    log_prediction_event(
+        settings.prediction_log_path,
+        image_path=str(temp_path),
+        label=res.label,
+        confidence=res.confidence,
+        scores=res.scores,
+        interface="api",
+    )
 
     if res.confidence < settings.low_confidence_threshold:
         fb = FeedbackManager()
@@ -81,4 +90,6 @@ def run_retrain() -> dict:
     artifact = RetrainOrchestrator().maybe_retrain()
     if artifact is None:
         return {"status": "skipped", "reason": "not enough labeled samples"}
+    if not artifact.promoted:
+        return {"status": "gated", "artifact": artifact.model_dump()}
     return {"status": "ok", "artifact": artifact.model_dump()}

@@ -61,6 +61,10 @@ class TrainArtifact(BaseModel):
     labels: list[str]
     model_path: str
     created_from: int
+    metrics: dict[str, float] = Field(default_factory=dict)
+    promoted: bool = True
+    gate_reasons: list[str] = Field(default_factory=list)
+    mlflow_run_id: str | None = None
 
 
 def ensure_dir(path: Path) -> Path:

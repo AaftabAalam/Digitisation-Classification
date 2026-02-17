@@ -1,0 +1,7 @@
+retrain:
+  min_samples: 20
+  validation_split: 0.2
+  promote_min_f1: 0.7
+  promote_min_precision: 0.7
+  promote_min_recall: 0.7
+  device: cpu
